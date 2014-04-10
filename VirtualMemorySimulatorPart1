@@ -1,0 +1,403 @@
+import java.util.Scanner;
+import java.io.*;
+
+
+class GetSetClass{
+    public
+            int virtualAddress, pageNumber, Offset;
+    byte [] pageBytes=new byte[256];
+    boolean flag;
+            void setAddress(int address)
+    {
+        virtualAddress=address;
+     
+    }
+            int getAddress(){
+                return virtualAddress;
+            }
+            void setPage(int pageNo)
+    {
+        pageNumber=pageNo;
+     
+    }
+            int getPage(){
+                return pageNumber;
+            }
+            
+            
+             void setOffset(int offset)
+    {
+        Offset=offset;
+     
+    }
+            int getOffset(){
+                return Offset;
+            }
+            
+            void setPageAddress(byte [] b)
+    {
+            pageBytes=b;
+     
+    }
+            byte [] getPageAddress(){
+                
+                return pageBytes;
+            }
+            void setFlag(boolean var){
+                flag=var;
+            }
+            boolean getFlag(){
+                return flag;
+            }
+}
+class PhysicalMemory{
+    public
+            int index;
+            byte [] b=new byte[256];
+            boolean flag;
+            PhysicalMemory next;
+            PhysicalMemory prev;
+            
+            PhysicalMemory(int index, byte [] b, boolean flag){
+                this.index=index;
+                this.b=b;
+                this.flag=flag;
+            }
+            
+            void display(){
+                System.out.print(index+":");
+                for(int i=0;i<256;i++){
+                    System.out.print(b[i]);
+                }
+                System.out.print(":"+flag);
+                System.out.println();
+            }
+            
+            int returnIndex(){
+                return index;
+            }
+            
+}
+class DoublyLinkedList{
+    PhysicalMemory firstNode;
+    PhysicalMemory lastNode;
+    DoublyLinkedList(){
+        firstNode=null;
+        lastNode=null;
+    }
+    
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+
+    void insertAtLastNode(int index, byte[] b, boolean flag){
+        PhysicalMemory newNode=new PhysicalMemory(index, b, false);
+        if(isEmpty()){
+            firstNode=newNode;
+        }
+        else{
+        lastNode.next=newNode;
+        newNode.prev=lastNode;
+        
+        }
+        lastNode=newNode;
+    }
+    void addInformation(int index, byte b[], boolean flag){
+        PhysicalMemory temp=firstNode;
+        while(temp.index!=index){
+            temp=temp.next;
+        }
+        temp.b=b;
+        temp.flag=flag;
+    }
+    void display(){
+        PhysicalMemory temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            //System.out.println();
+        }
+    }
+    byte accessData(int pageNumber, int offset){
+        PhysicalMemory temp=firstNode;
+        while(temp.index!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.b[offset];
+    }
+}
+class TLBList{
+    TLB firstNode;
+    TLB lastNode;
+    TLBList(){
+        firstNode=null;
+        lastNode=null;
+    }
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+    void insertAtLastNode(int pageNo, int frameNo, boolean validBit){
+        TLB newNode=new TLB(pageNo, frameNo, validBit);
+        
+        if(isEmpty()){
+            firstNode=newNode;
+        }
+        else{
+        lastNode.next=newNode;
+        newNode.prev=lastNode;
+        
+        }
+        lastNode=newNode;
+    }
+    void addInformation(int pageNumber, boolean flag){
+        TLB temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        temp.validBit=flag;
+    }
+    
+    void display(){
+        TLB temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            System.out.println();
+        }
+    }
+    boolean accessInfo(int pageNumber){
+        TLB temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.validBit;
+    }
+}
+class TLB{
+    public
+            int pageNo;
+            int frameNo;
+            boolean validBit;
+            TLB next;
+            TLB prev;
+            TLB(int pageNo, int frameNo, boolean validBit){
+                this.pageNo=pageNo;
+                this.frameNo=frameNo;
+                this.validBit=validBit;
+            }
+            void display(){
+                System.out.println(pageNo+":"+frameNo+":"+validBit);
+            }
+}
+
+
+class PageList{
+    PageTable firstNode;
+    PageTable lastNode;
+    
+    PageList(){
+        firstNode=null;
+        lastNode=null;
+    }
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+    void insertAtLastNode(int pageNo, int frameNo, boolean validBit){
+        
+        PageTable newNode=new PageTable(pageNo, frameNo, validBit);
+        
+        if(isEmpty()){
+            firstNode=newNode;
+        }
+        else{
+        lastNode.next=newNode;
+        newNode.prev=lastNode;
+        
+        }
+        lastNode=newNode;
+    }
+    void addInformation(int pageNumber){
+        PageTable temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        temp.validBit=true;
+    }
+    void display(){
+        PageTable temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            System.out.println();
+        }
+    }
+    boolean accessInformation(int pageNumber){
+        PageTable temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.validBit;
+    }
+    
+}
+class PageTable{
+    public
+            int pageNo;
+            int frameNo;
+            boolean validBit;
+            PageTable next;
+            PageTable prev;
+            PageTable(int pageNo, int frameNo, boolean validBit){
+                this.pageNo=pageNo;
+                this.frameNo=frameNo;
+                this.validBit=validBit;
+            }
+            void display(){
+                System.out.println(pageNo+":"+frameNo+":"+validBit);
+            }
+}
+
+
+
+class ReadFile{
+    public
+    int baseAddress, offset, pageNo, frameNo, virtualAddress, phyAddress, limitAddress;
+    int mapAddress(int address){
+        virtualAddress=address;
+        pageNo=virtualAddress/256;
+        offset=virtualAddress%256;
+        frameNo=pageNo;
+        //frameNo++;
+        baseAddress=frameNo*256;
+        phyAddress=baseAddress+offset;
+        return phyAddress;
+    }
+    byte [] accessFile(int address){
+        byte [] addr=new byte[256];
+        virtualAddress=address;
+        pageNo=virtualAddress/256;
+        offset=virtualAddress%256;
+        frameNo=pageNo;
+        baseAddress=frameNo*256;
+        //limitAddress=baseAddress+256;
+        try{
+             RandomAccessFile file=new RandomAccessFile(".\\BACKING_STORE.bin", "r");
+             file.seek(baseAddress);
+             file.readFully(addr);
+        }
+        catch(Exception e){
+            System.out.println("Exception="+ e);
+        }
+        return addr;
+    }
+    byte readFile(int PA){
+        Byte b = null;
+        try{
+           
+            RandomAccessFile file=new RandomAccessFile(".\\BACKING_STORE.bin", "r");
+            file.seek(PA);
+            b=file.readByte();
+            //System.out.println("Character="+b);
+        }
+        catch(Exception e){
+        System.out.println("Exception="+ e);
+    }
+        return b;
+    }
+}
+
+
+public class VirtualMemorySimulator {
+    public static void main(String[] args) {
+        
+        
+        int physicalAddress, counter=0, pageNum, offset;
+        byte data;
+        byte [] array=new byte[256];
+        int check=1, k=0;
+        int count=0, TLBHit=0;
+        //Create TLB and intialize it with deafult values.
+        TLBList ptr=new TLBList();
+        for(int i=0;i<16;i++)
+            ptr.insertAtLastNode(i, i, false);
+       //ptr.display();
+        
+        //Create PageTable and initialize it with deafult values.
+        PageList ptr1=new PageList();
+        for(int i=0;i<256;i++)
+            ptr1.insertAtLastNode(i, i, false);
+       //ptr1.display();
+        
+      
+       
+       //Create Physical memory and initialize it with deafult values.
+       DoublyLinkedList dll=new DoublyLinkedList();
+       for(int i=0;i<256;i++)
+           array[i]=0;
+       
+       for(int i=0;i<256;i++)
+           dll.insertAtLastNode(i, array, false);
+       //dll.display();
+        
+        //Below block of code access and read BACKING_STORE.bin file
+        ReadFile rf=new ReadFile();
+        GetSetClass getsetobj=new GetSetClass();
+        
+        
+        
+         try{
+            FileInputStream ifstream=new FileInputStream(".\\addresses.txt");
+            //DataInputStream inData=new DataInputStream(ifstream);
+            BufferedReader br=new BufferedReader(new InputStreamReader(ifstream));
+            String address=null;
+            do
+            {
+                address=br.readLine();      //read address from addresses.txt file
+                getsetobj.setAddress(Integer.parseInt(address));   //convert it into integer and store it in global variable
+                physicalAddress=rf.mapAddress(getsetobj.getAddress());
+                getsetobj.setPageAddress(rf.accessFile(getsetobj.getAddress()));
+                getsetobj.setPage(getsetobj.getAddress()/256);
+                getsetobj.setOffset((getsetobj.getAddress())%256);
+                getsetobj.setFlag(true);
+                
+                if(getsetobj.getPage()<=15)
+                    ;
+                else
+                    check=0;
+                
+                if(check==1){
+                    if(ptr.accessInfo(getsetobj.getPage())==false){
+                            dll.addInformation(getsetobj.getPage(), getsetobj.getPageAddress(), getsetobj.getFlag());
+                            ptr.addInformation(getsetobj.getPage(), true);
+                            count++;
+                            TLBHit++;
+                        }
+                        data=dll.accessData(getsetobj.getPage(), getsetobj.getOffset());
+                        
+                }
+                    
+                else {
+                    if(ptr1.accessInformation(getsetobj.getPage())==false){
+                            dll.addInformation(getsetobj.getPage(), getsetobj.getPageAddress(), getsetobj.getFlag());
+                            ptr1.addInformation(getsetobj.getPage());
+                            count++;
+                            }
+                            data=dll.accessData(getsetobj.getPage(), getsetobj.getOffset());
+                }
+                 
+                System.out.println(address+"= Value:"+data);
+                counter++;
+                k++;
+            }while(counter<1000);
+        }
+        catch(Exception e){
+            System.out.println("Exception="+e);
+        }
+         System.out.println();
+         System.out.println("\tPage Fault count="+count);
+        
+         System.out.println("\tTLBHit count="+TLBHit);  
+        System.out.println("<---------------------------------------End of Part 1----------------------------------------->");
+        
+    }
+}
