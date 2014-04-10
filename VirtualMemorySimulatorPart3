@@ -1,0 +1,834 @@
+import java.util.Scanner;
+import java.io.*;
+import java.util.Arrays;
+
+
+class GetSetClassPart3{
+    public
+            int virtualAddress, pageNumber, Offset, frameNumber, c, replacePN, replaceFN;
+    int DB;
+    byte data;
+    byte [] pageBytes=new byte[256];
+    boolean flag;
+            void setAddress(int address)
+            {
+        virtualAddress=address;
+     
+            }
+            int getAddress(){
+                return virtualAddress;
+            }
+            void setPage(int pageNo)
+            {
+        pageNumber=pageNo;
+     
+            }
+            int getPage(){
+                return pageNumber;
+            }
+            
+            
+            void setOffset(int offset)
+            {
+        Offset=offset;
+     
+            }
+            int getOffset(){
+                return Offset;
+            }
+            
+            void setFrameNumber(int frameNo)
+            {
+        frameNumber=frameNo;
+     
+            }
+            int getFrameNumber(){
+                return frameNumber;
+            }
+            
+            void setPageAddress(byte [] b)
+            {
+            pageBytes=b;
+     
+            }
+            byte [] getPageAddress(){
+                
+                return pageBytes;
+            }
+            
+            void setFlag(boolean var){
+                flag=var;
+            }
+            boolean getFlag(){
+                return flag;
+            }
+            void setData(byte var){
+                data=var;
+            }
+            byte getData(){
+                return data;
+            }
+            void setCounter(int var){
+                c=var;
+            }
+            int getCounter(){
+                return c;
+            }
+            void setRFN(int var){
+                replaceFN=var;
+            }
+            int getRFN(){
+                return replaceFN;
+            }
+            void setRPN(int var){
+                replacePN=var;
+            }
+            int getRPN(){
+                return replacePN;
+            }
+            void setDB(int var){
+                DB=var;
+            }
+            int getDB(){
+                return DB;
+            }
+}
+class LruQueuePart3{
+    public
+            int pageNumber;
+            LruQueuePart3 next;
+            LruQueuePart3 prev;
+            
+            LruQueuePart3(int pageNo){
+                this.pageNumber=pageNo;
+            }
+            
+            void display(){
+                
+                    System.out.print(pageNumber+" ");
+                
+            }
+}
+class LruListPart3{
+    LruQueuePart3 firstNode;
+    LruQueuePart3 lastNode;
+    
+    LruListPart3(){
+        firstNode=null;
+        lastNode=null;
+    }
+    
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+    
+    boolean insertAtFirstNode(int pageNo){
+            boolean check=false, length=false;
+        LruQueuePart3 newNode=new LruQueuePart3(pageNo);
+        LruQueuePart3 temp=firstNode, curr=firstNode;
+        if(isEmpty()){
+            lastNode=newNode;
+            firstNode=newNode;
+            length=true;
+        }
+        else{
+        while(temp!=null){
+            if(temp.pageNumber==newNode.pageNumber){
+              check=true;
+              break;
+            }
+            else
+                ;
+            temp=temp.next;
+        }
+       
+        if(check==true){
+             if(temp==firstNode){
+                 ;
+            }
+             else{
+                    while(curr.next!=temp)
+                        curr=curr.next;
+                          if(temp.next!=null){
+                         curr.next=temp.next;
+                         temp=temp.next;
+                         temp.prev=curr;
+                     }
+                     else{
+                            curr.next=null;
+                            temp.prev=null;
+                            lastNode=curr;
+                     }
+                     firstNode.prev=newNode;
+                     newNode.next=firstNode;
+                     firstNode=newNode;
+             }
+             length=false;
+        }
+        else{
+                
+                    firstNode.prev=newNode;
+                       
+                newNode.next=firstNode;
+                firstNode=newNode;
+                length=true;
+        }
+       }
+        return length;
+    }
+    
+    int insertLRU(int pageNo){
+            boolean check=false;
+            int replace=0;
+        LruQueuePart3 newNode=new LruQueuePart3(pageNo);
+        LruQueuePart3 temp=firstNode, curr=firstNode;
+        
+        while(temp!=null){
+            if(temp.pageNumber==newNode.pageNumber){
+              check=true;
+              break;
+            }
+            else
+                ;
+            temp=temp.next;
+        }
+        if(check==true){
+             if(temp==firstNode){
+                 ;
+            }
+             else{
+                    while(curr.next!=temp)
+                       curr=curr.next;
+            
+                    if(temp.next!=null){
+                
+                        curr.next=temp.next;
+                        temp=temp.next;
+                        temp.prev=curr;
+                 }
+                else{
+               
+                    curr.next=null;
+                    temp.prev=null;
+                    lastNode=curr;
+                }
+            firstNode.prev=newNode;
+            newNode.next=firstNode;
+            firstNode=newNode;
+             }
+        }
+        else{
+            while(curr.next!=lastNode)
+                curr=curr.next;
+            replace=lastNode.pageNumber;
+            curr.next=null;
+            lastNode=curr;
+                    firstNode.prev=newNode;
+                       
+                newNode.next=firstNode;
+                firstNode=newNode;
+        }
+        return replace;
+    }
+
+
+    void display(){
+        LruQueuePart3 temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            
+        }
+        System.out.println();
+    }
+    void checkInfo(int pageNo){
+        LruQueuePart3 temp=firstNode;
+        while(temp.pageNumber!=pageNo){
+             temp=temp.next;
+        }
+        
+    }
+}
+class PhysicalMemoryPart3{
+    public
+            int index;
+            byte [] b=new byte[256];
+            boolean flag;
+            int references;
+            int dirtyBit;
+            
+            PhysicalMemoryPart3 next;
+            PhysicalMemoryPart3 prev;
+            
+            PhysicalMemoryPart3(int index, byte [] b, boolean flag, int DB){
+                this.index=index;
+                this.b=b;
+                this.flag=flag;
+                this.dirtyBit=DB;
+                
+            }
+            
+            void display(){
+                System.out.print(index+":");
+                for(int i=0;i<256;i++){
+                    System.out.print(b[i]);
+                }
+                System.out.print(":"+flag);
+                System.out.println();
+            }
+            
+            int returnIndex(){
+                return index;
+            }
+            
+}
+class DoublyLinkedListPart3{
+    PhysicalMemoryPart3 firstNode;
+    PhysicalMemoryPart3 lastNode;
+    
+    PhysicalMemoryPart3 lru;
+    DoublyLinkedListPart3(){
+        firstNode=null;
+        lastNode=null;
+    }
+    
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+
+    void insertAtLastNode(int index, byte[] b, boolean flag){
+        PhysicalMemoryPart3 newNode=new PhysicalMemoryPart3(index, b, false, -1);
+        if(isEmpty()){
+            firstNode=newNode;
+        }
+        else{
+        lastNode.next=newNode;
+        newNode.prev=lastNode;
+        
+        }
+        lastNode=newNode;
+    }
+    void addInformation(int index, byte b[], boolean flag, int DB){
+        PhysicalMemoryPart3 temp=firstNode;
+        while(temp.index!=index){
+            temp=temp.next;
+        }
+        temp.b=b;
+        temp.flag=flag;
+        temp.dirtyBit=DB;
+    }
+    void display(){
+        PhysicalMemoryPart3 temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            //System.out.println();
+        }
+    }
+    byte accessData(int pageNumber, int offset){
+        PhysicalMemoryPart3 temp=firstNode;
+        while(temp.index!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.b[offset];
+    }
+    byte [] incrementReference(int frameNumber){
+       
+        PhysicalMemoryPart3 temp=firstNode;
+        while(temp.index!=frameNumber){
+            temp=temp.next;
+        }
+        return temp.b;
+    }
+    int returnDirtyBit(int index){
+        PhysicalMemoryPart3 temp=firstNode;
+        while(temp.index!=index){
+            temp=temp.next;
+        }
+        return temp.dirtyBit;
+    }
+    
+}
+class TLBListPart3{
+    TLBPart3 firstNode;
+    TLBPart3 lastNode;
+    TLBListPart3(){
+        firstNode=null;
+        lastNode=null;
+    }
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+    void insertAtLastNode(int pageNo, int frameNo, boolean validBit){
+        TLBPart3 newNode=new TLBPart3(pageNo, frameNo, validBit, -1);
+        
+        if(isEmpty()){
+            firstNode=newNode;
+        }
+        else{
+        lastNode.next=newNode;
+        newNode.prev=lastNode;
+        
+        }
+        lastNode=newNode;
+    }
+    void addInformation(int pageNumber, boolean flag, int DB){
+        TLBPart3 temp=firstNode;
+        while(temp.frameNo!=pageNumber){
+            temp=temp.next;
+        }
+        temp.validBit=flag;
+        temp.dirtyBit=DB;
+    }
+    
+    void display(){
+        TLBPart3 temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            System.out.println();
+        }
+    }
+    boolean accessInfo(int pageNumber){
+        TLBPart3 temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        return temp.validBit;
+        }
+        return temp.validBit;
+    }
+    
+    int getFrameNo(int pageNumber){
+        TLBPart3 temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.frameNo;
+    }
+    
+    void addInfo(int pageNumber, int RPN, int RFN){
+        TLBPart3 temp=firstNode, ptr=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        temp.frameNo=-1;
+        temp.validBit=false;
+        while(ptr.pageNo!=RPN){
+            ptr=ptr.next;
+        }
+        ptr.frameNo=RFN;
+        ptr.validBit=true;
+    }
+       
+}
+class TLBPart3{
+    public
+            int pageNo;
+            int frameNo;
+            boolean validBit;
+            int dirtyBit;
+            TLBPart3 next;
+            TLBPart3 prev;
+            TLBPart3(int pageNo, int frameNo, boolean validBit, int DB){
+                this.pageNo=pageNo;
+                this.frameNo=frameNo;
+                this.validBit=validBit;
+                this.dirtyBit=DB;
+            }
+            void display(){
+                System.out.println(pageNo+":"+frameNo+":"+validBit);
+            }
+}
+
+
+class PageListPart3{
+    PageTablePart3 firstNode;
+    PageTablePart3 lastNode;
+    PageListPart3(){
+        firstNode=null;
+        lastNode=null;
+    }
+    boolean isEmpty(){
+        return (firstNode==null);
+    }
+    void insertAtLastNode(int pageNo, int frameNo, boolean validBit){
+        PageTablePart3 newNode=new PageTablePart3(pageNo, frameNo, validBit, -1);
+        
+        if(isEmpty()){
+            firstNode=newNode;
+        }
+        else{
+        lastNode.next=newNode;
+        newNode.prev=lastNode;
+        
+        }
+        lastNode=newNode;
+    }
+    void addInformation(int pageNumber, int frameNumber, int DB){
+        PageTablePart3 temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        temp.frameNo=frameNumber;
+        temp.validBit=true;
+        temp.dirtyBit=DB;
+    }
+    void display(){
+        PageTablePart3 temp=firstNode;
+        while(temp!=null){
+            temp.display();
+            temp=temp.next;
+            System.out.println();
+        }
+    }
+    boolean accessInformation(int pageNumber){
+        PageTablePart3 temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.validBit;
+    }
+    
+    int getFrameNo(int pageNumber){
+        PageTablePart3 temp=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        return temp.frameNo;
+    }
+    void addInfo(int pageNumber, int RPN, int RFN){
+        PageTablePart3 temp=firstNode, ptr=firstNode;
+        while(temp.pageNo!=pageNumber){
+            temp=temp.next;
+        }
+        temp.frameNo=-1;
+        temp.validBit=false;
+        while(ptr.pageNo!=RPN){
+            ptr=ptr.next;
+        }
+        ptr.frameNo=RFN;
+        ptr.validBit=true;
+    }
+    
+}
+class PageTablePart3{
+    public
+            int pageNo;
+            int frameNo;
+            boolean validBit;
+            int dirtyBit;
+            PageTablePart3 next;
+            PageTablePart3 prev;
+            PageTablePart3(int pageNo, int frameNo, boolean validBit, int DB){
+                this.pageNo=pageNo;
+                this.frameNo=frameNo;
+                this.validBit=validBit;
+                this.dirtyBit=DB;
+            }
+            void display(){
+                System.out.println(pageNo+":"+frameNo+":"+validBit);
+            }
+}
+
+
+
+class ReadFilePart3{
+    public
+    int baseAddress, offset, pageNo, frameNo, virtualAddress, phyAddress, limitAddress;
+    int mapAddress(int address){
+        virtualAddress=address;
+        pageNo=virtualAddress/256;
+        offset=virtualAddress%256;
+        frameNo=pageNo;
+        //frameNo++;
+        baseAddress=frameNo*256;
+        phyAddress=baseAddress+offset;
+        return phyAddress;
+    }
+    byte [] accessFile(int address){
+        byte [] addr=new byte[256];
+        virtualAddress=address;
+        pageNo=virtualAddress/256;
+        offset=virtualAddress%256;
+        frameNo=pageNo;
+        baseAddress=frameNo*256;
+        //limitAddress=baseAddress+256;
+        try{
+             RandomAccessFile file=new RandomAccessFile(".\\BACKING_STORE.bin", "r");
+             file.seek(baseAddress);
+             file.readFully(addr);
+        }
+        catch(Exception e){
+            System.out.println("Exception="+ e);
+        }
+        return addr;
+    }
+    byte readFile(int PA){
+        Byte b = null;
+        try{
+           
+            RandomAccessFile file=new RandomAccessFile(".\\BACKING_STORE.bin", "r");
+            file.seek(PA);
+            b=file.readByte();
+            //System.out.println("Character="+b);
+        }
+        catch(Exception e){
+        System.out.println("Exception="+ e);
+    }
+        return b;
+    }
+    void writeFile(byte [] b, int BA){
+        try{
+            RandomAccessFile file=new RandomAccessFile(".\\BACKING_STORE.bin", "rw");
+            file.seek(BA*256);
+            file.write(b);
+        }
+        catch(Exception e){
+            System.out.println("Exception="+ e);
+        }
+    }
+}
+
+
+public class VirtualMemorySimulatorPart3 {
+    
+    public static void main(String[] args) {
+        
+        
+        int physicalAddress, counter=0, pageNum, offset, RFN, RPN, length=0;
+        byte data;
+        byte [] array=new byte[256];
+        int c=0;
+        int check=1, DB, write=0;
+        int count=0, replace, TLBHit=0;
+        boolean len;
+        String [] dirtyBit=new String[8];
+        //Create TLB and intialize it with deafult values.
+        TLBListPart3 ptr=new TLBListPart3();
+        for(int i=0;i<16;i++)
+            ptr.insertAtLastNode(i, i, false);
+       //ptr.display();
+        
+        //Create PageTable and initialize it with deafult values.
+        PageListPart3 ptr1=new PageListPart3();
+        for(int i=0;i<256;i++)
+            ptr1.insertAtLastNode(i, i, false);
+       //ptr1.display();
+        
+      
+       
+       //Create Physical memory and initialize it with deafult values.
+       DoublyLinkedListPart3 dll=new DoublyLinkedListPart3();
+       for(int i=0;i<256;i++)
+           array[i]=0;
+       
+      
+       for(int i=0;i<128;i++)
+           dll.insertAtLastNode(i, array, false);
+       //dll.display();
+       
+       LruListPart3 lru=new LruListPart3();
+       
+        //Below block of code access and read BACKING_STORE.bin file
+        ReadFilePart3 rf=new ReadFilePart3();
+        GetSetClassPart3 getsetobj=new GetSetClassPart3();
+        
+         try{
+            FileInputStream ifstream=new FileInputStream(".\\addresses2.txt");
+            //DataInputStream inData=new DataInputStream(ifstream);
+            BufferedReader br=new BufferedReader(new InputStreamReader(ifstream));
+            String address=null;
+            
+            do
+            {
+                
+                if(length!=128){
+                        address=br.readLine();      //read address from addresses.txt file
+                        dirtyBit=address.split(" ");
+                        getsetobj.setAddress(Integer.parseInt(dirtyBit[0]));
+                        if("R".equals(dirtyBit[1]))
+                            getsetobj.setDB(0);
+                        else
+                             getsetobj.setDB(1);
+                        //System.out.println(dirtyBit[0]);
+                       // getsetobj.setAddress(Integer.parseInt(address));   //convert it into integer and store it in global variable
+                        physicalAddress=rf.mapAddress(getsetobj.getAddress());
+                        getsetobj.setPage(getsetobj.getAddress()/256);
+                        getsetobj.setOffset((getsetobj.getAddress())%256);
+                      
+                        if(getsetobj.getPage()<=15)
+                                ;
+                        else
+                            check=0;
+                
+                        if(check==1){
+                        
+                            if(ptr.accessInfo(getsetobj.getPage())==false){
+                                     getsetobj.setPageAddress(rf.accessFile(getsetobj.getAddress()));
+                                     getsetobj.setFlag(true);
+                                    
+                                    len=lru.insertAtFirstNode(getsetobj.getPage());
+                                    if(len==true){
+                                         
+                                         dll.addInformation(length, getsetobj.getPageAddress(), getsetobj.getFlag(), getsetobj.getDB());
+                                    ptr.addInformation(length, true,  getsetobj.getDB());
+                                    length++;
+                                    }
+                                       
+                                    else{
+                                        ;
+                                    }
+                                    getsetobj.setFrameNumber(length);
+                                    count++;
+                                    TLBHit++;
+                            }
+                            else{
+                                getsetobj.setFrameNumber(ptr.getFrameNo(getsetobj.getPage()));
+                            }
+                                //dll.incrementReference(getsetobj.getFrameNumber(), ++c);
+                            data=dll.accessData(getsetobj.getFrameNumber(), getsetobj.getOffset());
+                            getsetobj.setData(data);
+                        
+                        }
+                    
+                        else {
+                                if((ptr1.accessInformation(getsetobj.getPage()))==false){
+                                    getsetobj.setPageAddress(rf.accessFile(getsetobj.getAddress()));
+                                     getsetobj.setFlag(true);
+                                    
+                                    len=lru.insertAtFirstNode(getsetobj.getPage());
+                                    if(len==true){
+                                        
+                                        dll.addInformation(length, getsetobj.getPageAddress(), getsetobj.getFlag(), getsetobj.getDB());
+                                    ptr1.addInformation(getsetobj.getPage(), length, getsetobj.getDB());
+                                    getsetobj.setFrameNumber(length);
+                                    length++;
+                                    }
+                                    else{
+                                        ;
+                                    }
+                                    
+                                    count++;
+                                    
+                                }
+                                else{
+                                    getsetobj.setFrameNumber(ptr1.getFrameNo(getsetobj.getPage()));
+                                len=lru.insertAtFirstNode(getsetobj.getPage());
+                                }
+                                  //dll.incrementReference(getsetobj.getFrameNumber(), ++c);
+                                data=dll.accessData(getsetobj.getFrameNumber(), getsetobj.getOffset());
+                                getsetobj.setData(data);
+                        }
+                 
+
+                }
+                else{
+                        address=br.readLine();      //read address from addresses2.txt file
+                        dirtyBit=address.split(" ");
+                        getsetobj.setAddress(Integer.parseInt(dirtyBit[0]));
+                        if("R".equals(dirtyBit[1]))
+                            getsetobj.setDB(0);
+                        else
+                             getsetobj.setDB(1);
+                        physicalAddress=rf.mapAddress(getsetobj.getAddress());
+                        getsetobj.setPage(getsetobj.getAddress()/256);
+                        getsetobj.setOffset((getsetobj.getAddress())%256);
+                       
+                        if(getsetobj.getPage()<=15)
+                                ;
+                        else
+                            check=0;
+                        if(check==1){
+                            
+                                if(ptr.accessInfo(getsetobj.getPage())==false){
+                                     getsetobj.setPageAddress(rf.accessFile(getsetobj.getAddress()));
+                                     getsetobj.setFlag(true);
+                                     replace=lru.insertLRU(getsetobj.getPage());
+                                     getsetobj.setRPN(replace);
+                                     RFN=ptr.getFrameNo(getsetobj.getRPN());
+                                     getsetobj.setRFN(RFN);
+                                     if(replace==0)
+                                         ;
+                                     else{
+                                            if(dll.returnDirtyBit(getsetobj.getRFN())==1){
+                                                rf.writeFile(dll.incrementReference(getsetobj.getRFN()), getsetobj.getRPN());
+                                                getsetobj.setDB(0);
+                                                write++;
+                                            }
+                                            
+                                            ptr.addInformation(getsetobj.getRPN(), false, 0);
+                                            dll.addInformation(getsetobj.getRFN(), getsetobj.getPageAddress(), getsetobj.getFlag(), getsetobj.getDB());
+                                            ptr.addInfo(getsetobj.getRPN(), getsetobj.getPage(), getsetobj.getFrameNumber());
+                                            
+                                     }
+                                   // lru.insertAtFirstNode(getsetobj.getPage());
+                                    getsetobj.setFrameNumber(getsetobj.getRFN());
+                                    count++;
+                                    TLBHit++;
+                            }
+                            else
+                                getsetobj.setFrameNumber(ptr.getFrameNo(getsetobj.getPage()));
+                                //dll.incrementReference(getsetobj.getFrameNumber(), ++c);
+                            data=dll.accessData(getsetobj.getFrameNumber(), getsetobj.getOffset());
+                            getsetobj.setData(data);
+                               
+                        }
+                        else{
+                            
+                            if(ptr1.accessInformation(getsetobj.getPage())==false){
+                                     getsetobj.setPageAddress(rf.accessFile(getsetobj.getAddress()));
+                                     getsetobj.setFlag(true);
+                                     replace=lru.insertLRU(getsetobj.getPage());
+                                     getsetobj.setRPN(replace);
+                                     RFN=ptr1.getFrameNo(getsetobj.getRPN());
+                                     getsetobj.setRFN(RFN);
+                                     if(replace==0)
+                                         ;
+                                     else{
+                                         if(dll.returnDirtyBit(getsetobj.getRFN())==1){
+                                             
+                                             rf.writeFile(dll.incrementReference(getsetobj.getRFN()), getsetobj.getRPN());
+                                                getsetobj.setDB(0);
+                                                write++;
+                                         }
+                                         ptr1.addInformation(getsetobj.getRPN(), getsetobj.getRFN(), 0);
+                                            dll.addInformation(getsetobj.getRFN(), getsetobj.getPageAddress(), getsetobj.getFlag(), getsetobj.getDB());
+                                          ptr1.addInfo(getsetobj.getRPN(), getsetobj.getPage(), getsetobj.getFrameNumber());
+                                     }
+                                   // lru.insertAtFirstNode(getsetobj.getPage());
+                                    getsetobj.setFrameNumber(getsetobj.getRFN());
+                                    count++;
+                            }
+                            else{
+                                getsetobj.setFrameNumber(ptr1.getFrameNo(getsetobj.getPage()));
+                                replace=lru.insertLRU(getsetobj.getPage());
+                                     getsetobj.setRPN(replace);
+                                     RFN=ptr1.getFrameNo(getsetobj.getRPN());
+                                     getsetobj.setRFN(RFN);
+                            }
+                                //dll.incrementReference(getsetobj.getFrameNumber(), ++c);
+                            data=dll.accessData(getsetobj.getFrameNumber(), getsetobj.getOffset());
+                            getsetobj.setData(data);
+                            
+                        }
+                                
+
+                }
+                                
+                System.out.println(address+"= Value:"+getsetobj.getData());
+               //lru.display();
+                counter++;
+            }while(counter<1000);
+        }
+        catch(Exception e){
+            System.out.println("Exception="+e);
+        }
+         System.out.println();
+         System.out.println("\tPage Fault count="+count);
+         System.out.println("\tWrites="+write);
+         System.out.println("\tTLBHit count="+TLBHit);  
+         
+        System.out.println("<---------------------------------------End of Part 3----------------------------------------->");
+        
+    }
+}
