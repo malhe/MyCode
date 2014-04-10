@@ -1,0 +1,130 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Configuration;
+using System.Data;
+using System.Configuration;
+using System.Web.Security;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using System.Text;
+using System.Drawing;
+using System.Net;
+using System.Xml;
+using System.Net.Mail;
+
+
+
+
+public partial class _Default : System.Web.UI.Page 
+{
+
+    static public String[] arr = new String[2];
+    protected void Page_Load(object sender, EventArgs e)
+    {
+ 
+        
+    }
+    protected void b1_Click(object sender, EventArgs e)
+    {
+
+        b1_ModalPopupExtender.Show(); 
+
+
+     }
+    [System.Web.Services.WebMethod]
+    public static String putresult(String city)
+    {
+        String js = "";
+        try
+        {
+
+
+            StringBuilder url2 = new StringBuilder("http://maps.googleapis.com/maps/api/geocode/xml?address=");
+            url2.Append(city);
+            url2.Append("&");
+            url2.Append("sensor=");
+            url2.Append("false");
+            String uri = url2.ToString();
+
+            HttpWebRequest req;
+            req = (HttpWebRequest)WebRequest.Create(uri);
+            req.Method = "GET";
+            req.KeepAlive = false;
+
+            HttpWebResponse res = (HttpWebResponse)req.GetResponse();
+            StreamReader rs = new StreamReader(res.GetResponseStream());
+
+            XmlDocument xmldoc = new XmlDocument();
+            xmldoc.Load(rs);
+
+            arr[0] = xmldoc.GetElementsByTagName("geometry")[0].ChildNodes[0].ChildNodes[0].ChildNodes[0].Value;
+            arr[1] = xmldoc.GetElementsByTagName("geometry")[0].ChildNodes[0].ChildNodes[1].ChildNodes[0].Value;
+ 
+
+             js =  arr[0] + "," + arr[1];
+           
+       }
+        catch (Exception ex)
+        {
+            Utilities.LogError(ex);
+        }
+
+
+        return js;
+    } 
+    protected void b2_Click(object sender, EventArgs e)
+    {
+           String str1, str2;
+           str1 = arr[0];
+           str2 = arr[1];
+
+        try
+        {
+
+            
+          
+                AstroUserManagement.adduser(tb1.Text, tb2.Text,tx.Text, tb4.Text, dd2.Text, dd3.Text, dd4.Text, dd1.Text, tb10.Text, tb6.Text,DateTime.Now.Date, DateTime.Now.ToShortTimeString(),System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.GetValue(0).ToString(), "Windows OS", str1, str2, tb7.Text);
+                MailMessage msg = new MailMessage("tester@wowonweb.com", tb7.Text, "Confirmation Email", "Hello");
+                msg.CC.Add("malhar.deshpande12@gmail.com");
+                SmtpClient email = new SmtpClient("mail.wowonweb.com", 587);
+                email.Credentials = new NetworkCredential("tester@wowonweb.com", "TestTest123");
+                email.EnableSsl = true;
+                email.Send(msg);
+
+                //tb1.Text = String.Empty;
+                //tb2.Text = String.Empty;
+                //tb4.Text = String.Empty;
+                //tb10.Text = String.Empty;
+                //tb6.Text = String.Empty;
+                //tb7.Text = String.Empty;
+                //tx.Text = String.Empty;
+
+                //        dd1.SelectedValue = "0";
+                //        dd2.SelectedValue = "0";
+                //        dd3.SelectedValue = "0";
+                //        dd4.SelectedValue = "0";
+                
+               
+          
+        }
+        catch (Exception ex)
+        {
+            Utilities.LogError(ex);
+        }
+        Response.Write("Mail Sent");
+      
+       }
+
+
+
+
+    protected void btnOk_Click(object sender, EventArgs e)
+    {
+
+    }
+}
